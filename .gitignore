@@ -106,5 +106,8 @@ venv.bak/
 # Python setting
 setting.py
 
+# Aurin data
+spartialise-data.json
+
 # Mac stuff
 .DS_Store

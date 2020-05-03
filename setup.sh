@@ -41,7 +41,10 @@ for port in "${ports[@]}"; do  curl -X GET http://${user}:${pass}@localhost:${po
 
 # Create database
 curl -X PUT -H 'Authorization: Basic YWRtaW46YWRtaW50ZXN0' -H 'Host: localhost:5984' http://localhost:5984/twitter
+curl -X PUT -H 'Authorization: Basic YWRtaW46YWRtaW50ZXN0' -H 'Host: localhost:5984' http://localhost:5984/aurin
+
+# Install python dependencies
+pip3 install -r requirements.txt
 
 # Start mining twitter data
-pip3 install -r requirements.txt
 python3 twitter.py
