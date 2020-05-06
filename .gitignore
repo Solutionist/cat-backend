@@ -107,7 +107,9 @@ venv.bak/
 setting.py
 
 # Aurin data
-spartialise-data.json
+sa1_data.csv
+sa1.geojson
+aurin.json
 
 # Mac stuff
 .DS_Store
