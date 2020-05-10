@@ -19,6 +19,5 @@ app = FastAPI(title="Assignment 2 - Cloud & Cluster API", version="1.0", descrip
 app.include_router(route.router, tags=["Sentiment Analysis"])
 
 if __name__ == "__main__":    
-    # # Gunicorn logging
-    #app.run()
-    uvicorn.run(app, host=config.g_host, port=config.g_port)
+    # Gunicorn logging
+    app.run()

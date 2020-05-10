@@ -8,7 +8,7 @@ from cloudant.client import CouchDB
 import setting.config as config
 
 def connectDatabase(database):
-    client = CouchDB(config.user, config.password, url='http://{}:{}'.format(config.host, config.port), connect=True)
+    client = CouchDB(config.db_user, config.db_password, url='http://{}:{}'.format(config.db_host, config.db_port), connect=True)
     db = client[database]
     return db
 

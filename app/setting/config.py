@@ -1,8 +1,8 @@
 # CouchDB
-user = 'admin'
-password = 'admintest'
-host = 'localhost'
-port = '5984'
+db_user = 'admin'
+db_password = 'admintest'
+db_host = 'localhost'
+db_port = '5984'
 
 # Internal logging
 filename = "../internal.log"
