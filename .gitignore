@@ -107,9 +107,8 @@ venv.bak/
 setting.py
 
 # Aurin data
-sa1_data.csv
-sa1.geojson
-aurin.json
+life_expectancy.csv
+city.csv
 
 # Mac stuff
 .DS_Store

@@ -1,2 +1,0 @@
-tweepy==3.8.0
-pycouchdb==1.14.1
