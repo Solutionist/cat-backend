@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     for i in language:
         text = DesignDocument(db, document_id='text_{}'.format(i), partitioned=False)
-        text.add_view("place", "function(doc) {{ if (doc.lang == '{}') {{} emit(doc.place.full_name, [doc.text, doc.extended_tweet.full_text]); }} }}".format(i))
+        text.add_view("place", "function(doc) {{ if (doc.lang == '{}') {{ emit(doc.place.full_name, [doc.text, doc.extended_tweet.full_text]); }} }}".format(i))
         text.add_view("date", "function(doc) {{ if (doc.lang == '{}') {{ emit(doc.created_at.slice(-4), [doc.place.full_name, doc.text, doc.extended_tweet.full_text]); }} }}".format(i))
         text.save()
 
