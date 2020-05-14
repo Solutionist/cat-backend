@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 # Setting variable
 echo "== Set variables =="

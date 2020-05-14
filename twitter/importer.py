@@ -1,15 +1,17 @@
 # Library
-import json
 import argparse
-import pycouchdb
 import csv
-from cloudant.client import CouchDB
+import json
+
 import setting as cf
+from cloudant.client import CouchDB
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--filename', type=str, dest='filename', default='./aurin.json', help='Choose the json file to import into couchDB')
-    parser.add_argument('--db', type=str, dest='database', default='aurin', help='Choose the database to import the data into')
+    parser.add_argument('--filename', type=str, dest='filename', default='./aurin.json',
+                        help='Choose the json file to import into couchDB')
+    parser.add_argument('--db', type=str, dest='database', default='aurin',
+                        help='Choose the database to import the data into')
     parser.add_argument('--type', type=str, dest='fileType', default='csv', help='Choose the file type (csv/json)')
     args = parser.parse_args()
 

@@ -2,19 +2,20 @@
 # -*- coding: utf-8 -*-
 # Library
 import statistics
-from geopy.geocoders import Nominatim
-from textblob import TextBlob
-from googletrans import Translator
 
 # Import other files
 import data.database as db
+from geopy.geocoders import Nominatim
+from googletrans import Translator
+from textblob import TextBlob
+
 
 def checkAnalyze(city, state):
     # Variable
     valid_city = False
     valid_state = False
     capital_city = False
-    
+
     # Change to small letter and then capitalize the first character
     modified_city = city.lower().capitalize()
     modified_state = state.lower().capitalize()
@@ -31,8 +32,9 @@ def checkAnalyze(city, state):
     for i in result:
         if i['capital'] == 'admin':
             capital_city = True
-    
+
     return valid_city, valid_state, capital_city, modified_city, modified_state
+
 
 def getGeolocation(address):
     # Getting bounding box and address
@@ -42,9 +44,11 @@ def getGeolocation(address):
 
     return location, bounding_box
 
+
 def removeEmoji(string):
     newString = string.encode('ascii', 'ignore').decode('ascii')
     return newString
+
 
 def translateLanguage(data):
     # Variable
@@ -59,8 +63,9 @@ def translateLanguage(data):
 
     # Bulk translate
     translators = translator.translate(text, dest='en')
-    
+
     return translators
+
 
 def sentimentAnalysis(data):
     # Variable
@@ -84,12 +89,16 @@ def sentimentAnalysis(data):
 
     return output
 
+
 ### This working is not done yet ###
 def getAurin():
     # Variable
-    aus_state = ['Victoria', 'New South Wales', 'Queensland', 'Western Australia', 'South Australia', 'Tasmania', 'Australian Capital Territory', 'Northern Territory']
-    aurin_state = ['Rest of Vic.', 'Rest of NSW', 'Rest of Qld', 'Rest of WA', 'Rest of SA', 'Rest of Tas.', 'Australian Capital Territory', 'Rest of NT']
-    aurin_city = ['Greater Melbourne', 'Greater Sydney', 'Greater Brisbane', 'Greater Perth', 'Greater Adelaide', 'Greater Hobart', 'Australian Capital Territory', 'Greater Darwin']
+    aus_state = ['Victoria', 'New South Wales', 'Queensland', 'Western Australia', 'South Australia', 'Tasmania',
+                 'Australian Capital Territory', 'Northern Territory']
+    aurin_state = ['Rest of Vic.', 'Rest of NSW', 'Rest of Qld', 'Rest of WA', 'Rest of SA', 'Rest of Tas.',
+                   'Australian Capital Territory', 'Rest of NT']
+    aurin_city = ['Greater Melbourne', 'Greater Sydney', 'Greater Brisbane', 'Greater Perth', 'Greater Adelaide',
+                  'Greater Hobart', 'Australian Capital Territory', 'Greater Darwin']
     data = []
     location = []
 

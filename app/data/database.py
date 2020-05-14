@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # Library
-from cloudant.design_document import DesignDocument
-from cloudant.query import Query
-from cloudant.client import CouchDB
-
 # File
 import setting.config as config
+from cloudant.client import CouchDB
+from cloudant.query import Query
+
 
 def connectDatabase(database):
-    client = CouchDB(config.db_user, config.db_password, url='http://{}:{}'.format(config.db_host, config.db_port), connect=True)
+    client = CouchDB(config.db_user, config.db_password, url='http://{}:{}'.format(config.db_host, config.db_port),
+                     connect=True)
     db = client[database]
     return db
+
 
 # Search view for text
 def getText(query, view_type, language="en"):
@@ -25,10 +26,10 @@ def getText(query, view_type, language="en"):
         result = db.get_view_result('_design/text_{}'.format(language), view_type, key="{}".format(query))
     else:
         result = db.get_view_result('_design/text_all', view_type, key="{}".format(query))
-    
+
     # Variable
     value = []
-    
+
     # Set variable to check if database is empty
     check_list = list(result)
 
@@ -36,7 +37,7 @@ def getText(query, view_type, language="en"):
     if not check_list:
         message = "Error: Does not find the value requested"
         return message
-    
+
     # Parse data to value and return
     else:
         for i in result:
@@ -46,43 +47,44 @@ def getText(query, view_type, language="en"):
                 text = ""
                 location = ""
                 date = ""
-                
+
                 # Store text if extended tweet is not empty
                 if i["value"][2] != "":
                     text = i["value"][2]
-                
+
                 # Store text if extended tweet is empty
                 elif i["value"][2] == "":
                     text = i["value"][1]
-                
+
                 # Store other value
                 date = i["key"]
                 location = i["value"][0]
-                
+
                 # Store value
                 value.append({"date": date, "text": text, "location": location})
-            
+
             # For search type = place
             elif view_type == "place":
                 # Variable
                 text = ""
                 location = ""
-                
+
                 # Store text if extended tweet is not empty
                 if i["value"][1] != "":
                     text = i["value"][1]
-                
+
                 # Store text if extended tweet is empty
                 elif i["value"][1] == "":
                     text = i["value"][0]
-                
+
                 # Store other value
                 location = i["key"]
-                
+
                 # Store value
                 value.append({"location": location, "text": text})
 
         return value
+
 
 def getLifeExpectancy(query=None, by='name'):
     # Connect to the database
@@ -103,8 +105,9 @@ def getLifeExpectancy(query=None, by='name'):
     if not data:
         message = "Result: no data found in the database that match with the query"
         return message
-    
+
     return data.result[:]
+
 
 def getCity(city, state):
     # Connect to the database
@@ -116,5 +119,5 @@ def getCity(city, state):
     if not data:
         message = "Result: no data found in the database that match with the query"
         return message
-    
+
     return data.result[:]

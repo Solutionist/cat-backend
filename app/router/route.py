@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Partial
+# Import other files
+import data.database as db
+import router.language_code as lc
+import router.logic as lg
+import router.model as model
 from fastapi import APIRouter, Form
 from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse
 
-# Import other files
-import data.database as db
-import router.model as model
-import router.logic as lg
-import router.language_code as lc
-
 # Create router
 router = APIRouter()
 
+
 # Endpoint
-@router.post("/analyze", summary="Generate subtitles in other languages", response_model=model.SentimentAnalyze, responses={**model.response_error}, tags=["Sentiment Analysis"])
+@router.post("/analyze", summary="Generate subtitles in other languages", response_model=model.SentimentAnalyze,
+             responses={**model.response_error}, tags=["Sentiment Analysis"])
 def sentiment_analyze(*, city: str = Form(..., description="the city/town name"),
-                    state: str = Form(..., description="the state name"),  
-                    language: str = Form("en", description="the specific language to do the sentiment analyze")):
-    
+                      state: str = Form(..., description="the state name"),
+                      language: str = Form("en", description="the specific language to do the sentiment analyze")):
     # Variable
     text_input = []
     full_language = ""
@@ -29,9 +29,9 @@ def sentiment_analyze(*, city: str = Form(..., description="the city/town name")
         valid_city, valid_state, capital_city, city, state = lg.checkAnalyze(city, state)
 
         # Return value if city or state does not exist
-        if valid_city == False or valid_state == False:
+        if not valid_city or not valid_state:
             response = {
-                'description': 'This city and/or state does not exist please try again' 
+                'description': 'This city and/or state does not exist please try again'
             }
             payload = jsonable_encoder(response)
             return JSONResponse(content=payload)
@@ -40,11 +40,11 @@ def sentiment_analyze(*, city: str = Form(..., description="the city/town name")
         if language != "en":
             if language not in lc.LANGUAGE_CODES:
                 response = {
-                    'description': 'This languages does not exist please try again' 
+                    'description': 'This languages does not exist please try again'
                 }
                 payload = jsonable_encoder(response)
                 return JSONResponse(content=payload)
-        
+
         # Change to full language name
         for key, value in lc.LANGUAGE_CODES.items():
             if language == key:
@@ -56,10 +56,10 @@ def sentiment_analyze(*, city: str = Form(..., description="the city/town name")
 
         # Get data from twitter
         twitter = db.getText(address, 'place', language)
-        
+
         if twitter == "Error: Does not find the value requested":
             response = {
-                'description': 'No data from this city and/or state please try other state & city' 
+                'description': 'No data from this city and/or state please try other state & city'
             }
             payload = jsonable_encoder(response)
             return JSONResponse(content=payload)
@@ -80,7 +80,7 @@ def sentiment_analyze(*, city: str = Form(..., description="the city/town name")
         output = lg.sentimentAnalysis(text_input)
 
         response = {
-            'city': city, 
+            'city': city,
             'state': state,
             'language': full_language,
             'bounding_box': bounding_box,
@@ -97,4 +97,3 @@ def sentiment_analyze(*, city: str = Form(..., description="the city/town name")
     # Missing required input value
     else:
         return JSONResponse(status_code=404, content={"description": "Missing input variable"})
-    
