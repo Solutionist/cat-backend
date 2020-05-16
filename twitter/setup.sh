@@ -12,8 +12,8 @@ export pass=admintest
 
 # Installing couchDB cluster
 echo "== Create the volumes =="
-for (( i=0; i<${size}; i++ )); do
-    docker volume create --name=db-data-${volumes[${i}]}
+for ((i = 0; i < ${size}; i++)); do
+  docker volume create --name=db-data-${volumes[${i}]}
 done
 
 echo "== Start the containers =="
@@ -21,28 +21,28 @@ docker-compose up -d
 
 sleep 30
 
+echo "== Setting up master =="
+curl -X POST -H "Content-Type: application/json" http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup -d '{"action": "enable_cluster", "bind_address":"0.0.0.0", "username": ${user}, "password": ${pass}, "node_count":"3"}'
+
 echo "== Add nodes to cluster =="
-for (( i=0; i<${size}; i++ )); do
+for ((i = 0; i < ${size}; i++)); do
   if [ "${nodes[${i}]}" != "${master_node}" ]; then
-    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@127.0.0.1:${master_port}/_cluster_setup \
-      -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": \"${user}\", \"password\":\"${pass}\", \"port\": 5984, \"node_count\": \"${size}\", \
+    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup \
+    -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": \"${user}\", \"password\":\"${pass}\", \"port\": 5984, \"node_count\": \"${size}\", \
            \"remote_node\": \"${nodes[${i}]}\", \"remote_current_user\": \"${user}\", \"remote_current_password\": \"${pass}\"}"
-    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@127.0.0.1:${master_port}/_cluster_setup \
-      -d "{\"action\": \"add_node\", \"host\":\"${nodes[${i}]}\", \"port\": 5984, \"username\": \"${user}\", \"password\":\"${pass}\"}"
+    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup \
+    -d "{\"action\": \"add_node\", \"host\":\"${nodes[${i}]}\", \"port\": \"${ports[${i}]}\", \"username\": \"${user}\", \"password\":\"${pass}\"}"
   fi
 done
 
 sleep 10
 
-curl http://${user}:${pass}@localhost:${master_port}/_cluster_setup
+echo "== Finalizing cluster setup =="
+curl -X POST -H "Content-Type: application/json" http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup -d '{"action": "finish_cluster"}'
 
-for port in "${ports[@]}"; do  curl -X GET http://${user}:${pass}@localhost:${port}/_membership; done
+curl http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup
+curl http://${user}:${pass}@${master_node}:${master_port}/_membership
+
 
 # Create database
-curl -X PUT -H 'Authorization: Basic YWRtaW46YWRtaW50ZXN0' -H 'Host: localhost:5984' http://localhost:5984/twitter
-
-# Install python dependencies
-pip3 install -r requirements.txt
-
-# Start mining twitter data
-python3 twitter.py
+curl -X PUT http://${user}:${pass}@${master_node}:${master_port}/twitter

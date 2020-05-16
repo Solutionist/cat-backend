@@ -3,4 +3,3 @@ cloudant==2.13.0
 googletrans==2.4.0
 shapely==1.7.0
 textblob==0.15.3
-asyncio==3.4.3

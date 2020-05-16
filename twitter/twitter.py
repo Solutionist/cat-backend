@@ -2,22 +2,14 @@ import os
 
 import tweepy
 import uvicorn
-from cloudant.client import CouchDB
-from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter
+from fastapi.responses import JSONResponse
+from globals import db_tweet as db_raw, db_parsed, db_ref
 from parse import Parser
 from pydantic import BaseModel
 
 app = FastAPI()
 router = APIRouter()
-
-load_dotenv()
-
-client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
-                 url='http://{}:{}'.format(os.getenv("COUCH_URL"), os.getenv("COUCH_PORT")), connect=True)
-db_raw = client["twitter"]
-db_parsed = client["parsed_data"]
-db_ref = client["reference"]
 
 auth = tweepy.OAuthHandler(os.getenv("TWITTER_CONSUMER_KEY"), os.getenv("TWITTER_CONSUMER_SECRET_KEY"))
 auth.set_access_token(os.getenv("TWITTER_ACCESS_TOKEN"), os.getenv("TWITTER_ACCESS_TOKEN_SECRET"))
@@ -64,35 +56,57 @@ twitterStreamListener = TwitterStreamListener()
 twitterStream = tweepy.Stream(auth=api.auth, listener=twitterStreamListener)
 
 
-class Key(BaseModel):
+class TweetStreamRequest(BaseModel):
     action: str
 
 
-@router.post("/tweet_stream")
-async def handle_stream(obj: Key):
+class TweetStreamResponse(BaseModel):
+    message: str
+
+
+@router.post("/tweet_stream",
+             response_model=TweetStreamResponse,
+             responses={
+                 400: {"model": TweetStreamResponse, "description": "Validity of action"},
+                 406: {"model": TweetStreamResponse, "description": "Cannot perform said action"},
+                 200: {
+                     "description": "Stream action to perform",
+                     "content": {
+                         "application/json": {
+                             "example": {"action": "start|stop|pause"}
+                         }
+                     },
+                 },
+             }, )
+async def handle_stream(obj: TweetStreamRequest):
     global STARTED
     if obj.action == "start":
         if not STARTED:
-            print("<< Started tweet stream >>")
             twitterStreamListener.should_run = True
             twitterStream.filter(locations=[111.560497, -39.244618, 155.461864, -11.021575], is_async=True)
             STARTED = True
-            return "STARTED"
+            print("<< Started tweet stream >>")
+            return dict(message="Stream has been started")
         else:
-            return "ALREADY RUNNING"
+            return JSONResponse(status_code=406,
+                                content=dict(message="Stream is already running. Cannot start a new stream"))
     elif obj.action in ["pause", "stop"]:
         if STARTED:
-            print("<< Ended tweet stream >>")
             twitterStreamListener.should_run = False
             STARTED = False
-            return "STOPPED"
+            print("<< Ended tweet stream >>")
+            return dict(message="Stream has been stopped")
+
         else:
-            return "NOT RUNNING"
+            return JSONResponse(status_code=406, content=dict(
+                message="Stream not started/inactive. Start stream before requesting to stop or pause"))
     else:
-        return "NOT A VALID KEY", 400
+        return JSONResponse(status_code=400, content={"message": "Not a known action. Try start|pause|stop"})
 
 
 app.include_router(router)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    host = os.getenv("SERVER_HOST")
+    port = int(os.getenv("SERVER_PORT"))
+    uvicorn.run(app, host=host, port=port)

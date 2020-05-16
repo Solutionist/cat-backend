@@ -1,18 +1,8 @@
-import os
-
-from cloudant.client import CouchDB
-from dotenv import load_dotenv
 from parse import Parser
 
-load_dotenv()
+from globals import db_parsed, db_ref, db_tweet as db_raw
 
-client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
-                 url='http://{}:{}'.format(os.getenv("COUCH_URL"), os.getenv("COUCH_PORT")), connect=True)
-db_raw = client["twitter"]
-db_parsed = client["parsed_data"]
-db_ref = client["reference"]
-
-for raw_doc in db_raw:
+for raw_doc in db_raw.__iter__(remote=True):
     try:
         parser = Parser(raw_doc)
         parser.init_parse()

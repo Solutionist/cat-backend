@@ -1,35 +1,31 @@
 import datetime
-import functools
-import os
-import re
-from functools import partial
+from functools import partial, wraps
 
-from cloudant.client import CouchDB
-from dotenv import load_dotenv
+from globals import db_aurin as db
 from googletrans import Translator
 from preprocessors import prep_for_sentiment, prep_for_translation
 from shapely.geometry import Polygon, Point
 from textblob import TextBlob
 
-load_dotenv()
 translator = Translator()
-client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
-                 url='http://{}:{}'.format(os.getenv("COUCH_URL"), os.getenv("COUCH_PORT")), connect=True)
-db = client["aurin"]
-code_map = db.get_view_result('_design/city_views', "code_map")
-code_coords = db.get_view_result('_design/city_views', "code_coords")
+
+code_map = dict()
+# code_coords = db.get_view_result('_design/city_views', "code_coords")
 
 polys = dict()
-for doc in code_coords.all():
+for doc in db.__iter__(remote=True):
     try:
-        polys.update({doc["key"]: Polygon(
-            [k for i in doc["value"] for j in i for k in j])})
+        code_map.update({
+            doc["properties"]["gcc_code16"]: doc["properties"]["gccsa_name"]
+        })
+        polys.update({doc["properties"]["gcc_code16"]: Polygon(
+            [k for i in doc["geometry"]["coordinates"] for j in i for k in j])})
     except KeyError:
         pass
 
 
 def track_fn_call(fn):
-    @functools.wraps(fn)
+    @wraps(fn)
     def wrapper(*args, **kwargs):
         wrapper.is_called = True
         return fn(*args, **kwargs)
@@ -56,7 +52,6 @@ class Parser:
         else:
             self.location = Point(tweet["coordinates"]["coordinates"])
         self.inferred_language = tweet.get("lang")
-        self.__translated = None
         self.__transition_text = None
         self.inferred_text = self.inferred_location = self.inferred_sentiment = self.inferred_year = None
 
@@ -69,13 +64,10 @@ class Parser:
     @track_fn_call
     def init_parse(self):
         # Translate if from different language
-        self.text = prep_for_translation(self.text)
-        if self.inferred_language == "en":
-            self.__transition_text = TextBlob(self.text)
-        else:
-            self.__translated = self.translate(self.text)
-            self.text = prep_for_sentiment(self.__translated.text)
-            self.__transition_text = TextBlob(self.text)
+        if self.inferred_language != "en":
+            self.text = self.translate(prep_for_translation(self.text)).text
+        self.text = prep_for_sentiment(self.text)
+        self.__transition_text = TextBlob(self.text)
         self.inferred_text = self.__transition_text.stripped
         polarity = self.__transition_text.polarity
         self.inferred_sentiment = dict(
@@ -83,18 +75,11 @@ class Parser:
             polarity=abs(polarity)
         )
         self.inferred_location = self.__get_location()
-        self.inferred_year = datetime.datetime.fromtimestamp(int(self.tweet["timestamp_ms"][:10])).year
+        self.inferred_year = int(self.tweet["created_at"].split(" ")[-1])
 
     def __get_location(self):
         bbox = self.location
         for code, polygon in polys.items():
             if polygon.intersects(bbox) or polygon.contains(bbox):
-                return dict(code=code, city=code_map.__getitem__(code)[0]["value"])
+                return dict(code=code, city=code_map.__getitem__(code))
         return dict()
-
-    @staticmethod
-    def __remove_pattern(input_txt, pattern):
-        r = re.findall(pattern, input_txt)
-        for i in r:
-            input_txt = re.sub(i, '', input_txt)
-        return input_txt
