@@ -27,7 +27,7 @@ services:
     restart: always
     container_name: couchDB-slave1
     ports:
-      - "5985:5984"
+      - "5984:5984"
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=admintest
@@ -43,7 +43,7 @@ services:
     container_name: couchDB-slave2
     restart: always
     ports:
-      - "5986:5984"
+      - "5984:5984"
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=admintest
