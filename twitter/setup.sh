@@ -18,7 +18,7 @@ done
 echo "== Start the containers =="
 docker-compose up -d
 
-sleep 30
+sleep 15
 
 echo "== Setting up nodes for cluster =="
 for ((i = 0; i < ${size}; i++)); do
