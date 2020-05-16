@@ -22,7 +22,7 @@ docker-compose up -d
 sleep 30
 
 echo "== Setting up master =="
-curl -X POST -H "Content-Type: application/json" http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup -d '{"action": "enable_cluster", "bind_address":"0.0.0.0", "username": ${user}, "password": ${pass}, "node_count":"3"}'
+curl -X POST -H "Content-Type: application/json" http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": ${user}, \"password\": ${pass}, \"node_count\":\"3\"}"
 
 echo "== Add nodes to cluster =="
 for ((i = 0; i < ${size}; i++)); do
