@@ -4,14 +4,6 @@ import string
 
 from nltk import word_tokenize
 
-try:
-    from nltk.corpus import stopwords
-    stop_words = set(stopwords.words("english"))
-except LookupError:
-    import nltk
-    nltk.download("stopwords", quite=True)
-    stop_words = set(stopwords.words("english"))
-
 __emoji_pattern = re.compile(
     u"(\ud83d[\ude00-\ude4f])|"
     u"(\ud83c[\udf00-\uffff])|"

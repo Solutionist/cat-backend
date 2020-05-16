@@ -1,4 +1,3 @@
-import datetime
 from functools import partial, wraps
 
 from globals import db_aurin as db
@@ -9,17 +8,14 @@ from textblob import TextBlob
 
 translator = Translator()
 
-code_map = dict()
-# code_coords = db.get_view_result('_design/city_views', "code_coords")
+code_map = db.get_view_result('_design/city_views', "code_map")
+code_coords = db.get_view_result('_design/city_views', "code_coords")
 
 polys = dict()
-for doc in db.__iter__(remote=True):
+for doc in code_coords.all():
     try:
-        code_map.update({
-            doc["properties"]["gcc_code16"]: doc["properties"]["gccsa_name"]
-        })
-        polys.update({doc["properties"]["gcc_code16"]: Polygon(
-            [k for i in doc["geometry"]["coordinates"] for j in i for k in j])})
+        polys.update({doc["key"]: Polygon(
+            [k for i in doc["value"] for j in i for k in j])})
     except KeyError:
         pass
 
@@ -75,11 +71,11 @@ class Parser:
             polarity=abs(polarity)
         )
         self.inferred_location = self.__get_location()
-        self.inferred_year = int(self.tweet["created_at"].split(" ")[-1])
+        self.inferred_year = self.tweet["created_at"].split(" ")[-1]
 
     def __get_location(self):
         bbox = self.location
         for code, polygon in polys.items():
             if polygon.intersects(bbox) or polygon.contains(bbox):
-                return dict(code=code, city=code_map.__getitem__(code))
+                return dict(code=code, city=code_map.__getitem__(code)[0]["value"])
         return dict()

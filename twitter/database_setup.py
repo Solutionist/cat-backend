@@ -48,20 +48,20 @@ def setup(_client):
         print(f"<---- `{db_name}` already populated ----->")
         del aurin_data
 
-    # master_view = "_design/city_views"
-    # if master_view not in db.list_design_documents():
-    #     print(f"<--- Creating views for `{db_name}` --->")
-    #     all_city_views = DesignDocument(db, document_id=master_view, partitioned=False)
-    #     all_city_views.add_view("code_map",
-    #                             "function (doc) {\n  emit(doc.properties.gcc_code16, doc.properties.gccsa_name);\n}")
-    #     all_city_views.add_view("code_coords",
-    #                             "function (doc) {\n  emit(doc.properties.gcc_code16, doc.geometry.coordinates);\n}")
-    #     all_city_views.add_view("hash",
-    #                             "function (doc) {\n  emit(doc.hash, 1);\n}")
-    #     all_city_views.save()
-    #     print("<-- Creation complete -->")
-    # else:
-    #     print(f"<--- Required views for `{db_name}` are already created --->")
+    master_view = "_design/city_views"
+    if master_view not in db.list_design_documents():
+        print(f"<--- Creating views for `{db_name}` --->")
+        all_city_views = DesignDocument(db, document_id=master_view, partitioned=False)
+        all_city_views.add_view("code_map",
+                                "function (doc) {\n  emit(doc.properties.gcc_code16, doc.properties.gccsa_name);\n}")
+        all_city_views.add_view("code_coords",
+                                "function (doc) {\n  emit(doc.properties.gcc_code16, doc.geometry.coordinates);\n}")
+        all_city_views.add_view("hash",
+                                "function (doc) {\n  emit(doc.hash, 1);\n}")
+        all_city_views.save()
+        print("<-- Creation complete -->")
+    else:
+        print(f"<--- Required views for `{db_name}` are already created --->")
 
     db_name = os.getenv("DB_PARSE")
     try:
