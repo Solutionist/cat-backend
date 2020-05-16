@@ -20,19 +20,14 @@ docker-compose up -d
 
 sleep 15
 
-echo "== Setting up nodes for cluster =="
-for ((i = 0; i < ${size}; i++)); do
-curl -X POST -H "Content-Type: application/json" http://${user}:${pass}@${nodes[${i}]}:${master_port}/_cluster_setup -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": \"${user}\", \"password\": \"${pass}\", \"node_count\":\"${size}\"}"
-done
-
 echo "== Add nodes to cluster =="
-for ((i = 0; i < ${size}; i++)); do
+for (( i=0; i<${size}; i++ )); do
   if [ "${nodes[${i}]}" != "${master_node}" ]; then
-    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup \
-    -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": \"${user}\", \"password\":\"${pass}\", \"port\": 5984, \"node_count\": \"${size}\", \
+    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@127.0.0.1:${master_port}/_cluster_setup \
+      -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": \"${user}\", \"password\":\"${pass}\", \"port\": 5984, \"node_count\": \"${size}\", \
            \"remote_node\": \"${nodes[${i}]}\", \"remote_current_user\": \"${user}\", \"remote_current_password\": \"${pass}\"}"
-    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup \
-    -d "{\"action\": \"add_node\", \"host\":\"${nodes[${i}]}\", \"port\": \"${master_port}\", \"username\": \"${user}\", \"password\":\"${pass}\"}"
+    curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@127.0.0.1:${master_port}/_cluster_setup \
+      -d "{\"action\": \"add_node\", \"host\":\"${nodes[${i}]}\", \"port\": 5984, \"username\": \"${user}\", \"password\":\"${pass}\"}"
   fi
 done
 
