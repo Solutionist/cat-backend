@@ -8,21 +8,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def str_add(s1: str, s2: str, delimiter: str = "") -> str:
-    return (s1 if s1 else "") + delimiter + (s2 if s2 else "")
-
-
-def flat_map(dict_o: dict) -> dict:
-    returnable = dict()
-    for k, v in dict_o.items():
-        if isinstance(v, dict):
-            v = flat_map(v)
-            returnable.update({str_add(k, _k, "_"): str(_v) for _k, _v in v.items()})
-        else:
-            returnable.update({k: str(v)})
-    return returnable
-
-
 def setup(_client):
     db_name = os.getenv("DB_REF")
     try:
@@ -56,8 +41,6 @@ def setup(_client):
                                 "function (doc) {\n  emit(doc.properties.gcc_code16, doc.properties.gccsa_name);\n}")
         all_city_views.add_view("code_coords",
                                 "function (doc) {\n  emit(doc.properties.gcc_code16, doc.geometry.coordinates);\n}")
-        all_city_views.add_view("hash",
-                                "function (doc) {\n  emit(doc.hash, 1);\n}")
         all_city_views.save()
         print("<-- Creation complete -->")
     else:
@@ -77,9 +60,8 @@ def setup(_client):
         all_custom_views.add_view("code_senti_lang",
                                   map_func="""
                                         function (doc) {
-                                            emit([doc.inferred_location.city, 
-                                                doc.inferred_sentiment.emotion, 
-                                                doc.inferred_language,
+                                            emit([doc.inferred_location.code, 
+                                                doc.inferred_sentiment.emotion,
                                                 doc.inferred_year], 
                                             1);
                                         }

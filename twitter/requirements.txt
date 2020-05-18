@@ -1,3 +1,8 @@
+pydantic
+nltk
+fastapi
+uvicorn
+numpy
 tweepy==3.8.0
 cloudant==2.13.0
 googletrans==2.4.0

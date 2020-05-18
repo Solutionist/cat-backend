@@ -21,13 +21,13 @@ docker-compose up -d
 sleep 15
 
 echo "== Add nodes to cluster =="
-for (( i=0; i<${size}; i++ )); do
+for ((i = 0; i < ${size}; i++)); do
   if [ "${nodes[${i}]}" != "${master_node}" ]; then
     curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@127.0.0.1:${master_port}/_cluster_setup \
-      -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": \"${user}\", \"password\":\"${pass}\", \"port\": 5984, \"node_count\": \"${size}\", \
+    -d "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\", \"username\": \"${user}\", \"password\":\"${pass}\", \"port\": 5984, \"node_count\": \"${size}\", \
            \"remote_node\": \"${nodes[${i}]}\", \"remote_current_user\": \"${user}\", \"remote_current_password\": \"${pass}\"}"
     curl -X POST -H 'Content-Type: application/json' http://${user}:${pass}@127.0.0.1:${master_port}/_cluster_setup \
-      -d "{\"action\": \"add_node\", \"host\":\"${nodes[${i}]}\", \"port\": 5984, \"username\": \"${user}\", \"password\":\"${pass}\"}"
+    -d "{\"action\": \"add_node\", \"host\":\"${nodes[${i}]}\", \"port\": 5984, \"username\": \"${user}\", \"password\":\"${pass}\"}"
   fi
 done
 
@@ -37,7 +37,6 @@ curl -X POST -H "Content-Type: application/json" http://${user}:${pass}@${master
 
 curl http://${user}:${pass}@${master_node}:${master_port}/_cluster_setup
 curl http://${user}:${pass}@${master_node}:${master_port}/_membership
-
 
 # Create database
 curl -X PUT http://${user}:${pass}@${master_node}:${master_port}/twitter

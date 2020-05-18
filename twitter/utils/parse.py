@@ -1,23 +1,13 @@
 from functools import partial, wraps
 
-from globals import db_aurin as db
 from googletrans import Translator
-from preprocessors import prep_for_sentiment, prep_for_translation
 from shapely.geometry import Polygon, Point
 from textblob import TextBlob
 
+from utils.preprocessors import prep_for_sentiment, prep_for_translation
+from utils.prog_globals import code_map, polys
+
 translator = Translator()
-
-code_map = db.get_view_result('_design/city_views', "code_map")
-code_coords = db.get_view_result('_design/city_views', "code_coords")
-
-polys = dict()
-for doc in code_coords.all():
-    try:
-        polys.update({doc["key"]: Polygon(
-            [k for i in doc["value"] for j in i for k in j])})
-    except KeyError:
-        pass
 
 
 def track_fn_call(fn):
@@ -77,5 +67,5 @@ class Parser:
         bbox = self.location
         for code, polygon in polys.items():
             if polygon.intersects(bbox) or polygon.contains(bbox):
-                return dict(code=code, city=code_map.__getitem__(code)[0]["value"])
+                return dict(code=code, city=code_map[code])
         return dict()

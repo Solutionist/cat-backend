@@ -1,2 +1,2 @@
 docker volume create --name=mnt
-docker-compose up --build
+docker-compose up -d --build

@@ -1,6 +1,6 @@
-from parse import Parser
+from utils.parse import Parser
 
-from globals import db_parsed, db_ref, db_tweet as db_raw
+from utils.prog_globals import db_parsed, db_ref, db_tweet as db_raw
 
 for raw_doc in db_raw.__iter__(remote=True):
     try:
