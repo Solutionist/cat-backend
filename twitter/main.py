@@ -9,7 +9,6 @@ app = FastAPI(title="Cloud & Cluster API", version="1.0",
               description="Assignment 2 API endpoints", docs_url="/docs", redoc_url=None)
 
 # Add route
-
 app.include_router(tweet_router, prefix="/tweet_stream", tags=["Twitter Stream Handler"])
 app.include_router(aurin_router, prefix="/aurin", tags=["Aurin data API"])
 app.include_router(data_router, prefix="/data", tags=["Twitter analysis data API"])
