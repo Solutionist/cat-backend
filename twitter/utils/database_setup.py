@@ -72,6 +72,12 @@ def setup(_client):
     else:
         print(f"<--- Required views for `{db_name}` are already created --->")
 
+    db_name = os.getenv("DB_TWEET")
+    try:
+        db = _client[db_name]
+    except KeyError:
+        print(f"database: `{db_name}` does not exist. Creating a new database.")
+        db = _client.create_database(db_name, False)
 
 if __name__ == '__main__':
     client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
