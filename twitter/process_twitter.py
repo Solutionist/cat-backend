@@ -1,6 +1,6 @@
 import os
 
-from globals import db_tweet as db_raw, db_parsed, db_ref, db_oldtweet
+from globals import db_parsed, db_ref, db_oldTweet, db_tweet as db_raw
 from parse import Parser
 
 def populate_db(data):
@@ -22,7 +22,7 @@ def populate_db(data):
         db_ref.create_document(dict(text=data["text"], raw_ref=raw_doc['_id'], parse_ref=None))
 
 if __name__ == "__main__":
-    for document in db_oldtweet:
+    for document in db_oldTweet:
         try:
             populate_db(document)
         except:
