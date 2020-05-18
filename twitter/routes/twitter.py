@@ -1,9 +1,10 @@
 import os
+import traceback
 
 import tweepy
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-import traceback
+
 from models.twitter import *
 from utils.parse import Parser
 from utils.prog_globals import db_tweet as db_raw, db_parsed, db_ref, logger

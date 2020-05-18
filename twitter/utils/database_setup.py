@@ -79,6 +79,7 @@ def setup(_client):
         print(f"database: `{db_name}` does not exist. Creating a new database.")
         db = _client.create_database(db_name, False)
 
+
 if __name__ == '__main__':
     client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
                      url='http://{}:{}'.format(os.getenv("COUCH_URL"), os.getenv("COUCH_PORT")), connect=True)

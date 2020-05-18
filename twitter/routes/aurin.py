@@ -52,10 +52,5 @@ def get_aurin_data(_id: Optional[str]):
             }
         ]
     }
-    # selector = {
-    #     'properties.feature_code': {
-    #         "$eq": _id
-    #     }
-    # }
     result = get_query_results(selector)
     return JSONResponse(result, status_code=200 if result else 204)

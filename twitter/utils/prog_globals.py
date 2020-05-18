@@ -3,7 +3,6 @@ import os
 
 import nltk
 from cloudant.client import CouchDB
-from cloudant.result import Result
 from dotenv import load_dotenv
 from shapely.geometry import Polygon
 
@@ -13,7 +12,8 @@ nltk.download("punkt")
 load_dotenv()
 
 client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
-                 url='http://{}:{}'.format(os.getenv("COUCH_URL"), os.getenv("COUCH_PORT")), connect=True)
+                 url='http://{}:{}'.format(os.getenv("COUCH_URL"), os.getenv("COUCH_PORT")), connect=True,
+                 auto_renew=True)
 try:
     db_aurin = client[os.getenv("DB_AURIN")]
     db_ref = client[os.getenv("DB_REF")]

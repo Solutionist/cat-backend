@@ -31,7 +31,7 @@ def get_data(group_level: GroupLevels):
 
 @data_router.get("/{_id}")
 def get_data(_id: str, group_level: GroupLevels):
-    # group_level-> 2: Place, Emotion <> 3: 2 + Language <> 4: 3 + Year
+    # group_level-> 1: Place <> 2: 1, Emotion <> 3: 2, Year
     result = view_result(group_level=int(group_level.value))
     if result:
         result = list(filter(lambda x: _id == x["key"][0], result["rows"]))
