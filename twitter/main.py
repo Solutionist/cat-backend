@@ -4,12 +4,13 @@ import tweepy
 import uvicorn
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
-from globals import db_tweet as db_raw, db_parsed, db_ref
+from globals import db_parsed, db_ref, db_tweet as db_raw
 from parse import Parser
 from pydantic import BaseModel
 
 app = FastAPI()
 router = APIRouter()
+
 
 auth = tweepy.OAuthHandler(os.getenv("TWITTER_CONSUMER_KEY"), os.getenv("TWITTER_CONSUMER_SECRET_KEY"))
 auth.set_access_token(os.getenv("TWITTER_ACCESS_TOKEN"), os.getenv("TWITTER_ACCESS_TOKEN_SECRET"))
