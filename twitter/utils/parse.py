@@ -1,17 +1,15 @@
 import os
 from functools import wraps
 
-from google.cloud import translate
+from google.cloud import translate_v2 as translate
 from shapely.geometry import Polygon, Point
 from textblob import TextBlob
 
-from utils.preprocessors import prep_for_sentiment
+from utils.preprocessors import prep_for_sentiment, prep_for_translation
 from utils.prog_globals import code_map, polys, logger
 
-
-client = translate.TranslationServiceClient()
-project_id = os.getenv("PROJECT_ID")
-parent = client.location_path(project_id, "global")
+client = translate.Client()
+project_id = os.getenv("GOOGLE_PROJECT_ID")
 
 
 def track_fn_call(fn):
@@ -24,34 +22,11 @@ def track_fn_call(fn):
     return wrapper
 
 
-def translate_text(text, src, dst="en"):
-    # Detect language for undefined
-    if src == "und":
-        response = client.detect_language(
-            content=text,
-            parent=parent,
-            mime_type="text/plain",
-        )
-
-        for language in response.languages:
-            src = language.language_code
-
-        # Return text if already is english
-        if src == dst:
-            return text
-
-    # Translate
-    response = client.translate_text(
-        parent=parent,
-        contents=text,
-        mime_type="text/plain",
-        source_language_code=src,
-        target_language_code=dst,
-    )
-
-    # Display the translation for each input text provided
-    for translation in response.translations:
-        return translation.translated_text
+def translate_text(text, dst="en"):
+    if not text:
+        return text
+    response = dict(client.translate(text, target_language=dst))
+    return response["translatedText"], response["detectedSourceLanguage"]
 
 
 class Parser:
@@ -84,7 +59,7 @@ class Parser:
         # Translate if from different language
         if self.inferred_language != "en":
             logger.info(f"Input language: {self.inferred_language}")
-            self.text = translate_text(self.text, self.inferred_language)
+            self.text, self.inferred_language = translate_text(prep_for_translation(self.text))
         self.text = prep_for_sentiment(self.text)
         self.__transition_text = TextBlob(self.text)
         self.inferred_text = self.__transition_text.stripped

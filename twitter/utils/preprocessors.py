@@ -34,7 +34,6 @@ __combined_patterns = r'|'.join(
 
 
 def prep_for_translation(text):
-    text = text.encode('ascii', 'ignore').decode('ascii')
     text = html.unescape(text)
     text = re.sub(__mention, "", text)
     text = re.sub(__website, "", text)
