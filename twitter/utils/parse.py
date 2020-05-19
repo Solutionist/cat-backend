@@ -8,8 +8,7 @@ from textblob import TextBlob
 from utils.preprocessors import prep_for_sentiment, prep_for_translation
 from utils.prog_globals import code_map, polys, logger
 
-client = translate.Client()
-project_id = os.getenv("GOOGLE_PROJECT_ID")
+translator = translate.Client()
 
 
 def track_fn_call(fn):
@@ -25,7 +24,7 @@ def track_fn_call(fn):
 def translate_text(text, dst="en"):
     if not text:
         return text
-    response = dict(client.translate(text, target_language=dst))
+    response = dict(translator.translate(text, target_language=dst))
     return response["translatedText"], response["detectedSourceLanguage"]
 
 
