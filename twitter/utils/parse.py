@@ -6,9 +6,10 @@ from shapely.geometry import Polygon, Point
 from textblob import TextBlob
 
 from utils.preprocessors import prep_for_sentiment, prep_for_translation
-from utils.prog_globals import code_map, polys, logger
+from utils.prog_globals import code_map, polys, logger, root_dir
 
-translator = translate.Client()
+translator = translate.Client.from_service_account_json(os.path.join(
+    root_dir, os.getenv("GOOGLE_APPLICATION_CREDENTIALS")))
 
 
 def track_fn_call(fn):
@@ -21,9 +22,9 @@ def track_fn_call(fn):
     return wrapper
 
 
-def translate_text(text, dst="en"):
+def translate_text(text, src, dst="en"):
     if not text:
-        return text
+        return text, src
     response = dict(translator.translate(text, target_language=dst))
     return response["translatedText"], response["detectedSourceLanguage"]
 
@@ -58,7 +59,7 @@ class Parser:
         # Translate if from different language
         if self.inferred_language != "en":
             logger.info(f"Input language: {self.inferred_language}")
-            self.text, self.inferred_language = translate_text(prep_for_translation(self.text))
+            self.text, self.inferred_language = translate_text(prep_for_translation(self.text), self.inferred_language)
         self.text = prep_for_sentiment(self.text)
         self.__transition_text = TextBlob(self.text)
         self.inferred_text = self.__transition_text.stripped

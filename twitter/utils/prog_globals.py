@@ -1,6 +1,7 @@
 import logging
 import os
 
+
 import nltk
 from cloudant.client import CouchDB
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ from utils.database_setup import setup
 
 nltk.download("punkt")
 load_dotenv()
+root_dir = os.path.dirname(os.path.realpath(__file__)).rsplit(os.sep, 1)[0]
 
 client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
                  url='http://{}:{}'.format(os.getenv("COUCH_URL"), os.getenv("COUCH_PORT")), connect=True,
