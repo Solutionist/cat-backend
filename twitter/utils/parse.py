@@ -8,9 +8,7 @@ from textblob import TextBlob
 from utils.preprocessors import prep_for_sentiment
 from utils.prog_globals import code_map, polys, logger
 
-# TODO: Is this necessary? GOOGLE_APPLICATION_CREDENTIALS are already set in env
-# Changelog: Took client and project definitions out of function call. You don't need to keep setting it everytime.
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
 client = translate.TranslationServiceClient()
 project_id = os.getenv("PROJECT_ID")
 parent = client.location_path(project_id, "global")
@@ -43,13 +41,12 @@ def translate_text(text, src, dst="en"):
             return text
 
     # Translate
-    # TODO: Can you check if the dst and src are interchanged?
     response = client.translate_text(
         parent=parent,
         contents=text,
         mime_type="text/plain",
-        source_language_code=dst,
-        target_language_code=src,
+        source_language_code=src,
+        target_language_code=dst,
     )
 
     # Display the translation for each input text provided
