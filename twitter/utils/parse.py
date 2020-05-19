@@ -1,15 +1,20 @@
+import os
 from functools import wraps
 
-import os
 from google.cloud import translate
 from shapely.geometry import Polygon, Point
 from textblob import TextBlob
-from dotenv import load_dotenv
 
-from utils.preprocessors import prep_for_sentiment, prep_for_translation
+from utils.preprocessors import prep_for_sentiment
 from utils.prog_globals import code_map, polys, logger
 
-load_dotenv()
+# TODO: Is this necessary? GOOGLE_APPLICATION_CREDENTIALS are already set in env
+# Changelog: Took client and project definitions out of function call. You don't need to keep setting it everytime.
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+client = translate.TranslationServiceClient()
+project_id = os.getenv("PROJECT_ID")
+parent = client.location_path(project_id, "global")
+
 
 def track_fn_call(fn):
     @wraps(fn)
@@ -20,18 +25,14 @@ def track_fn_call(fn):
     wrapper.is_called = False
     return wrapper
 
-def translate_text(text, src, dst="en" , project_id=os.getenv("PROJECT_ID")):
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
-    client = translate.TranslationServiceClient()
-    parent = client.location_path(project_id, "global")
-
+def translate_text(text, src, dst="en"):
     # Detect language for undefined
     if src == "und":
         response = client.detect_language(
             content=text,
             parent=parent,
-            mime_type="text/plain",  
+            mime_type="text/plain",
         )
 
         for language in response.languages:
@@ -42,6 +43,7 @@ def translate_text(text, src, dst="en" , project_id=os.getenv("PROJECT_ID")):
             return text
 
     # Translate
+    # TODO: Can you check if the dst and src are interchanged?
     response = client.translate_text(
         parent=parent,
         contents=text,
@@ -53,6 +55,7 @@ def translate_text(text, src, dst="en" , project_id=os.getenv("PROJECT_ID")):
     # Display the translation for each input text provided
     for translation in response.translations:
         return translation.translated_text
+
 
 class Parser:
     def __init__(self, tweet: dict):
@@ -83,7 +86,7 @@ class Parser:
     def init_parse(self):
         # Translate if from different language
         if self.inferred_language != "en":
-            logger.info("Input language: {}".format(self.inferred_language))
+            logger.info(f"Input language: {self.inferred_language}")
             self.text = translate_text(self.text, self.inferred_language)
         self.text = prep_for_sentiment(self.text)
         self.__transition_text = TextBlob(self.text)

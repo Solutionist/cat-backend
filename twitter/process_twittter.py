@@ -1,7 +1,6 @@
-import os
-
-from utils.prog_globals import db_tweet as db_raw, db_parsed, db_ref, db_oldTweet
 from utils.parse import Parser
+from utils.prog_globals import db_tweet as db_raw, db_parsed, db_ref, db_oldTweet
+
 
 def populate_db(data):
     raw_doc = db_raw.create_document(data)
@@ -20,6 +19,7 @@ def populate_db(data):
     except BaseException as e:
         print(type(e), e)
         db_ref.create_document(dict(text=data["text"], raw_ref=raw_doc['_id'], parse_ref=None))
+
 
 if __name__ == "__main__":
     for document in db_oldTweet:

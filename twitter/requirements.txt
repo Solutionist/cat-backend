@@ -1,8 +1,8 @@
-pydantic
-nltk
-fastapi
-uvicorn
-numpy
+pydantic==1.5.1
+nltk==3.5
+fastapi==0.54.1
+uvicorn==0.11.5
+numpy==1.18.4
 tweepy==3.8.0
 cloudant==2.13.0
 shapely==1.7.0

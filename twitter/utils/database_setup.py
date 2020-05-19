@@ -3,9 +3,6 @@ import os
 
 from cloudant.client import CouchDB
 from cloudant.design_document import DesignDocument
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 def setup(_client):
