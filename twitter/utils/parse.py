@@ -5,8 +5,12 @@ from google.cloud import translate_v2 as translate
 from shapely.geometry import Polygon, Point
 from textblob import TextBlob
 
-from utils.preprocessors import prep_for_sentiment, prep_for_translation
-from utils.prog_globals import code_map, polys, logger, root_dir
+try:
+    from utils.preprocessors import prep_for_sentiment, prep_for_translation
+    from utils.prog_globals import code_map, polys, logger, root_dir
+except (ImportError, ModuleNotFoundError):
+    from preprocessors import prep_for_sentiment, prep_for_translation
+    from prog_globals import code_map, polys, logger, root_dir
 
 translator = translate.Client.from_service_account_json(os.path.join(
     root_dir, os.getenv("GOOGLE_APPLICATION_CREDENTIALS")))

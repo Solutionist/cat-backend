@@ -7,7 +7,10 @@ from cloudant.client import CouchDB
 from dotenv import load_dotenv
 from shapely.geometry import Polygon
 
-from utils.database_setup import setup
+try:
+    from utils.database_setup import setup
+except (ImportError, ModuleNotFoundError):
+    from database_setup import setup
 
 nltk.download("punkt")
 load_dotenv()

@@ -1,6 +1,9 @@
-from utils.parse import Parser
-
-from utils.prog_globals import db_parsed, db_ref, db_tweet as db_raw
+try:
+    from utils.parse import Parser
+    from utils.prog_globals import db_parsed, db_ref, db_tweet as db_raw
+except (ImportError, ModuleNotFoundError):
+    from parse import Parser
+    from prog_globals import db_parsed, db_ref, db_tweet as db_raw
 
 for raw_doc in db_raw.__iter__(remote=True):
     try:
@@ -16,5 +19,8 @@ for raw_doc in db_raw.__iter__(remote=True):
         else:
             print("Failed creating tweet! Already exists!")
     except BaseException as e:
-        print(type(e), e)
-        db_ref.create_document(dict(text=raw_doc["text"], raw_ref=raw_doc['_id'], parse_ref=None))
+        try:
+            print(type(e), e)
+            db_ref.create_document(dict(text=raw_doc["text"], raw_ref=raw_doc['_id'], parse_ref=None))
+        except:
+            pass

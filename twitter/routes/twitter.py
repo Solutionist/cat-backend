@@ -11,7 +11,7 @@ from utils.prog_globals import db_tweet as db_raw, db_parsed, db_ref, logger
 
 auth = tweepy.OAuthHandler(os.getenv("TWITTER_CONSUMER_KEY"), os.getenv("TWITTER_CONSUMER_SECRET_KEY"))
 auth.set_access_token(os.getenv("TWITTER_ACCESS_TOKEN"), os.getenv("TWITTER_ACCESS_TOKEN_SECRET"))
-api = tweepy.API(auth, wait_on_rate_limit=True)
+api = tweepy.API(auth, wait_on_rate_limit=True, retry_count=3, retry_delay=60, timeout=1000)
 tweet_router = APIRouter()
 STARTED = False
 
