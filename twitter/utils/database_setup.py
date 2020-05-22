@@ -4,6 +4,8 @@ import os
 from cloudant.client import CouchDB
 from cloudant.design_document import DesignDocument
 
+root_dir = os.path.dirname(os.path.realpath(__file__)).rsplit(os.sep, 1)[0]
+
 
 def setup(_client):
     db_name = os.getenv("DB_REF")
@@ -20,7 +22,7 @@ def setup(_client):
         print(f"<< database: `{db_name}` does not exist. Creating a new database. >>")
         db = _client.create_database(db_name, False)
 
-    aurin_data = json.load(open("aurin.json", "r"))
+    aurin_data = json.load(open(os.path.join(root_dir, "aurin.json"), "r"))
     if db.doc_count() < 15:
         print(f"<-- Inserting into `{db_name}` db -->")
         for feature in aurin_data.get("features"):

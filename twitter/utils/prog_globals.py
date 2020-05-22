@@ -1,9 +1,8 @@
 import logging
 import os
 
-
 import nltk
-from cloudant.client import CouchDB
+from cloudant.client import CouchDB, CouchDatabase
 from dotenv import load_dotenv
 from shapely.geometry import Polygon
 
@@ -21,18 +20,18 @@ client = CouchDB(os.getenv("COUCH_USER"), os.getenv("COUCH_PASSWORD"),
                  auto_renew=True)
 
 try:
-    db_aurin = client[os.getenv("DB_AURIN")]
-    db_ref = client[os.getenv("DB_REF")]
-    db_tweet = client[os.getenv("DB_TWEET")]
-    db_parsed = client[os.getenv("DB_PARSE")]
+    db_aurin: CouchDatabase = client[os.getenv("DB_AURIN")]
+    db_ref: CouchDatabase = client[os.getenv("DB_REF")]
+    db_tweet: CouchDatabase = client[os.getenv("DB_TWEET")]
+    db_parsed: CouchDatabase = client[os.getenv("DB_PARSE")]
     # db_oldTweet = client[os.getenv("DB_OLD_TWEET")]
 except BaseException as e:
     print(type(e), e)
     setup(client)
-    db_aurin = client[os.getenv("DB_AURIN")]
-    db_ref = client[os.getenv("DB_REF")]
-    db_tweet = client[os.getenv("DB_TWEET")]
-    db_parsed = client[os.getenv("DB_PARSE")]
+    db_aurin: CouchDatabase = client[os.getenv("DB_AURIN")]
+    db_ref: CouchDatabase = client[os.getenv("DB_REF")]
+    db_tweet: CouchDatabase = client[os.getenv("DB_TWEET")]
+    db_parsed: CouchDatabase = client[os.getenv("DB_PARSE")]
     # db_oldTweet = client[os.getenv("DB_OLD_TWEET")]
 
 code_map = dict()

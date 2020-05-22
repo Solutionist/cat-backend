@@ -30,6 +30,12 @@ class TwitterStreamListener(tweepy.StreamListener):
         if status_code == 420:
             return False
 
+    def on_disconnect(self, notice):
+        logger.error("Stream Disconnected!", notice)
+
+    def on_exception(self, exception):
+        logger.error("Stream Exception!", exception)
+
 
 def populate_db(data):
     raw_doc = db_raw.create_document(data)
@@ -77,7 +83,7 @@ def get_stream_info():
 async def handle_stream(obj: TweetStreamRequest):
     global STARTED
     if obj.action == "start":
-        if not STARTED:
+        if not STARTED or not twitterStream.running:
             twitterStreamListener.should_run = True
             twitterStream.filter(locations=[111.560497, -39.244618, 155.461864, -11.021575], is_async=True)
             STARTED = True
