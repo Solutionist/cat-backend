@@ -1,5 +1,7 @@
 import os
 import traceback
+from queue import Queue
+from threading import Thread
 
 import tweepy
 from fastapi import APIRouter
@@ -17,13 +19,20 @@ STARTED = False
 
 
 class TwitterStreamListener(tweepy.StreamListener):
-    def __init__(self, should_run: bool = True):
+    def __init__(self, should_run: bool = True, workers=4):
         super().__init__()
+        self.process_thread = None
         self.should_run = should_run
+        self.message_queue = Queue()
+
+        for i in range(workers):
+            t = Thread(target=self.populate_db)
+            t.daemon = True
+            t.start()
 
     def on_status(self, status):
-        print(status.text, end="\t")
-        populate_db(status._json)
+        print(status.text)
+        self.message_queue.put(status._json)
         return self.should_run
 
     def on_error(self, status_code):
@@ -31,30 +40,40 @@ class TwitterStreamListener(tweepy.StreamListener):
             return False
 
     def on_disconnect(self, notice):
+        global STARTED
         logger.error("Stream Disconnected!", notice)
+        STARTED = False
+        args = TweetStreamRequest(action="start")
+        handle_stream(args)
 
     def on_exception(self, exception):
-        logger.error("Stream Exception!", exception)
+        global STARTED
+        logger.error("Stream Exception! Restarting stream", exception)
+        STARTED = False
+        args = TweetStreamRequest(action="start")
+        handle_stream(args)
 
-
-def populate_db(data):
-    raw_doc = db_raw.create_document(data)
-    try:
-        parser = Parser(data)
-        parser.init_parse()
-        params = parser.get_storable_params()
-        params["reference_id"] = raw_doc["_id"]
-        parsed_doc = db_parsed.create_document(params)
-        # Check that the document exists in the database
-        if raw_doc.exists() and parsed_doc.exists():
-            logger.info(f"RAW_REF: {raw_doc['_id']} :: PARSE_REF: {parsed_doc['_id']}")
-            db_ref.create_document(dict(text=data["text"], raw_ref=raw_doc['_id'], parse_ref=parsed_doc['_id']))
-        else:
-            print("Failed creating tweet! Already exists!")
-    except BaseException as e:
-        logger.error(type(e), e)
-        logger.error(traceback.format_exc())
-        db_ref.create_document(dict(text=data["text"], raw_ref=raw_doc['_id'], parse_ref=None))
+    def populate_db(self):
+        while True:
+            data = self.message_queue.get()
+            raw_doc = db_raw.create_document(data)
+            try:
+                parser = Parser(data)
+                parser.init_parse()
+                params = parser.get_storable_params()
+                params["reference_id"] = raw_doc["_id"]
+                parsed_doc = db_parsed.create_document(params)
+                # Check that the document exists in the database
+                if raw_doc.exists() and parsed_doc.exists():
+                    logger.info(f"RAW_REF: {raw_doc['_id']} :: PARSE_REF: {parsed_doc['_id']}")
+                    db_ref.create_document(dict(text=data["text"], raw_ref=raw_doc['_id'], parse_ref=parsed_doc['_id']))
+                else:
+                    print("Failed creating tweet! Already exists!")
+            except BaseException as e:
+                logger.error(type(e), e)
+                logger.error(traceback.format_exc())
+                db_ref.create_document(dict(text=data["text"], raw_ref=raw_doc['_id'], parse_ref=None))
+            self.message_queue.task_done()
 
 
 twitterStreamListener = TwitterStreamListener()
@@ -80,7 +99,7 @@ def get_stream_info():
                            },
                        },
                    }, )
-async def handle_stream(obj: TweetStreamRequest):
+def handle_stream(obj: TweetStreamRequest):
     global STARTED
     if obj.action == "start":
         if not STARTED or not twitterStream.running:
