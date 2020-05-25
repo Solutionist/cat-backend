@@ -100,7 +100,7 @@ def handle_stream(obj: TweetStreamRequest):
     if obj.action == "start":
         if not STARTED or not twitterStream.running:
             twitterStreamListener.should_run = True
-            twitterStream.filter(locations=[111.560497, -39.244618, 155.461864, -11.021575], is_async=True)
+            twitterStream.filter(locations=eval(os.getenv("LOCATION_AUSTRALIA_BB")), is_async=True)
             STARTED = True
             print("<< Started tweet stream >>")
             return dict(message="Stream has been started")
