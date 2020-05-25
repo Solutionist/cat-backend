@@ -11,6 +11,8 @@ try:
 except (ImportError, ModuleNotFoundError):
     from database_setup import setup
 
+if os.getenv("HTTP_PROXY"):
+    nltk.set_proxy(os.getenv("HTTP_PROXY"))
 nltk.download("punkt")
 load_dotenv()
 root_dir = os.path.dirname(os.path.realpath(__file__)).rsplit(os.sep, 1)[0]
