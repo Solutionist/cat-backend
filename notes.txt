@@ -3,10 +3,10 @@ https://docs.couchdb.org/en/latest/install/unix.html
 
 sudo apt-get update && sudo apt-get upgrade
 sudo apt-get install -y apt-transport-https gnupg ca-certificates
-echo "deb https://apache.bintray.com/couchdb-deb {distribution} main" | sudo tee -a /etc/apt/sources.list
 
 # Add repo key
 curl -L https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
+echo "deb https://apache.bintray.com/couchdb-deb bionic main" | sudo tee -a /etc/apt/sources.list
 
 # Install dependencies
 sudo apt-get update
@@ -41,9 +41,9 @@ sudo ss -tulpn
 
 # Unimebl Internal Proxy
 sudo nano /etc/environment
-HTTP_PROXY="http://wwwproxy.unimelb.edu.au:8000/"
-HTTPS_PROXY="http://wwwproxy.unimelb.edu.au:8000/"
-NO_PROXY="localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"
+export HTTP_PROXY="http://wwwproxy.unimelb.edu.au:8000/"
+export HTTPS_PROXY="http://wwwproxy.unimelb.edu.au:8000/"
+export NO_PROXY="localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"
 
 http_proxy="http://wwwproxy.unimelb.edu.au:8000/"
 https_proxy="http://wwwproxy.unimelb.edu.au:8000/"
@@ -66,3 +66,15 @@ docker rm $(docker ps -a -q)
 
 # Remove all dangling docker related stuff
 docker system prune -a --volumes
+
+{
+ "proxies":
+ {
+   "default":
+   {
+     "httpProxy": "http://wwwproxy.unimelb.edu.au:8000/",
+     "httpsProxy": "http://wwwproxy.unimelb.edu.au:8000/",
+     "noProxy": "localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"
+   }
+ }
+}
