@@ -43,15 +43,11 @@ class TwitterStreamListener(tweepy.StreamListener):
         global STARTED
         logger.error("Stream Disconnected!", notice)
         STARTED = False
-        args = TweetStreamRequest(action="start")
-        handle_stream(args)
 
     def on_exception(self, exception):
         global STARTED
         logger.error("Stream Exception! Restarting stream", exception)
         STARTED = False
-        args = TweetStreamRequest(action="start")
-        handle_stream(args)
 
     def populate_db(self):
         while True:
