@@ -1,0 +1,29 @@
+# Twitter
+TWITTER_ACCESS_TOKEN=**
+TWITTER_ACCESS_TOKEN_SECRET=**
+TWITTER_CONSUMER_KEY=**
+TWITTER_CONSUMER_SECRET_KEY=**
+
+# Couch DB Setting
+COUCH_USER="admin"
+COUCH_PASSWORD=**
+COUCH_URL="localhost"
+COUCH_PORT=5983
+
+# Couch DB Name
+DB_REF="h_reference"
+DB_AURIN="h_aurin"
+DB_PARSE="h_parsed_data"
+DB_TWEET="h_twitter"
+DB_OLD_TWEET="twitter"
+
+# API Setting
+SERVER_HOST="localhost"
+SERVER_PORT=5123
+
+# Logging
+LOG_FILENAME=application.log
+LOG_LEVEL=logging.DEBUG
+
+# Google Cloud Translation API
+GOOGLE_APPLICATION_CREDENTIALS=**

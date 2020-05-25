@@ -103,12 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# Python setting
-setting.py
-
-# Aurin data
-life_expectancy.csv
-city.csv
+# google credential setting
+client_secret.json
 
 # Mac stuff
 .DS_Store

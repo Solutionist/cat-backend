@@ -1,0 +1,14 @@
+version: '3'
+services:
+  web:
+    build: ./
+    volumes:
+      - mnt:/app
+    ports:
+      - "5123:5123"
+    env_file: .env
+
+volumes:
+  mnt:
+    external:
+      name: mnt

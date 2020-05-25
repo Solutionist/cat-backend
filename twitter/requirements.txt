@@ -1,2 +1,0 @@
-tweepy==3.8.0
-cloudant==2.13.0

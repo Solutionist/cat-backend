@@ -1,0 +1,68 @@
+# Install couchdb from source
+https://docs.couchdb.org/en/latest/install/unix.html
+
+sudo apt-get update && sudo apt-get upgrade
+sudo apt-get install -y apt-transport-https gnupg ca-certificates
+echo "deb https://apache.bintray.com/couchdb-deb {distribution} main" | sudo tee -a /etc/apt/sources.list
+
+# Add repo key
+curl -L https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
+
+# Install dependencies
+sudo apt-get update
+sudo apt-get --no-install-recommends -y install build-essential pkg-config erlang libmozjs185-dev libcurl4-openssl-dev libicu-dev git python-sphinx runit python3-pip
+
+# Install couchdb
+sudo apt install -y couchdb
+
+# Increase query timeout COUCHDB
+curl -XPUT localhost:5984/_config/couchdb/os_process_timeout -d '"60000"'
+
+# Create DB
+curl -X PUT http://127.0.0.1:5984/<db_name>
+
+# Increse memory limit
+# https://user.couchdb.apache.narkive.com/cvLkNQy5/error-while-indexing-a-big-json
+COUCHDB_QUERY_SERVER_JAVASCRIPT="/usr/bin/couchjs -S 536870912 /usr/share/server/main.js"
+COUCHDB_QUERY_SERVER_COFFEESCRIPT="/usr/bin/couchjs -S 536870912 /usr/share/server/main-coffee.js"
+
+# Add Design Document
+curl -XPUT http://localhost:5984/<db_name>/_design/<master_view_name> --data "@view.json"
+# Creating user
+adduser <username>
+# Adding user to sudo group
+usermod -aG sudo <username>
+
+# Port forwarding
+iptables -t nat -A OUTPUT -o lo -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+# List open ports
+sudo ss -tulpn
+
+# Unimebl Internal Proxy
+sudo nano /etc/environment
+HTTP_PROXY="http://wwwproxy.unimelb.edu.au:8000/"
+HTTPS_PROXY="http://wwwproxy.unimelb.edu.au:8000/"
+NO_PROXY="localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"
+
+http_proxy="http://wwwproxy.unimelb.edu.au:8000/"
+https_proxy="http://wwwproxy.unimelb.edu.au:8000/"
+no_proxy="localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"
+
+sudo nano /etc/apt/apt.conf
+Acquire::http::proxy "http://wwwproxy.unimelb.edu.au:8000/";
+Acquire::https::proxy "http://wwwproxy.unimelb.edu.au:8000/";
+
+# Installing RTREE on Ubuntu
+sudo apt-get update && sudo apt-get install python-rtree
+python3 -m pip install rtree
+
+# Installing pytorch on cpu-ubuntu
+python3 -m pip install torch==1.5.0+cpu torchvision==0.6.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
+# Stop and remove docker containers
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+
+# Remove all dangling docker related stuff
+docker system prune -a --volumes
