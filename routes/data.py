@@ -5,7 +5,6 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from models.data import DataResponse, SINGLECANDIDATE_KEYS
-from utils.language_code import LANGUAGE_CODES
 from utils.prog_globals import db_parsed
 
 data_router = APIRouter()
