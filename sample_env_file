@@ -5,20 +5,20 @@ TWITTER_CONSUMER_KEY=**
 TWITTER_CONSUMER_SECRET_KEY=**
 
 # Couch DB Setting
-COUCH_USER="admin"
+COUCH_USER=admin
 COUCH_PASSWORD=**
-COUCH_URL="localhost"
+COUCH_URL=localhost
 COUCH_PORT=5983
 
 # Couch DB Name
-DB_REF="h_reference"
-DB_AURIN="h_aurin"
-DB_PARSE="h_parsed_data"
-DB_TWEET="h_twitter"
-DB_OLD_TWEET="twitter"
+DB_REF=h_reference
+DB_AURIN=h_aurin
+DB_PARSE=h_parsed_data
+DB_TWEET=h_twitter
+DB_OLD_TWEET=n_twitter
 
 # API Setting
-SERVER_HOST="localhost"
+SERVER_HOST=localhost
 SERVER_PORT=5123
 
 # Logging
@@ -27,3 +27,6 @@ LOG_LEVEL=logging.DEBUG
 
 # Google Cloud Translation API
 GOOGLE_APPLICATION_CREDENTIALS=**
+
+# Bounding box of whole of Australia <used for streaming tweets>
+LOCATION_AUSTRALIA_BB=[113.338953078, -43.6345972634, 153.569469029, -10.6681857235]
