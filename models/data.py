@@ -9,6 +9,7 @@ class SingleCandidate(BaseModel):
     year: int
     language: str
     count: int
+    count_log: float
 
 
 SINGLECANDIDATE_KEYS = list(SingleCandidate.__fields__.keys())

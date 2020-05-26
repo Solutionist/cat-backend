@@ -1,3 +1,4 @@
+import math
 from enum import Enum
 from functools import partial
 
@@ -35,7 +36,8 @@ def get_data(group_level: GroupLevels, group_by: str = "year"):
         return JSONResponse({"msg": "Not a valid grouping. Try lang|language : year|yr"}, status_code=400)
     if result:
         result = filter(lambda x: None not in x["key"], result["rows"])
-        result = [dict(zip(keys[:int(group_level.value)], r["key"]), count=r["value"]) for r in result]
+        result = [dict(zip(keys[:int(group_level.value)], r["key"]), count=r["value"],
+                       count_log=0 if r["value"] < 1 else math.log(r["value"])) for r in result]
 
     return JSONResponse(result, status_code=200 if result else 204)
 
@@ -53,6 +55,8 @@ def get_data(_id: str, group_level: GroupLevels, group_by: str = "year"):
         return JSONResponse({"msg": "Not a valid grouping. Try lang|language : year|yr"}, status_code=400)
     if result:
         result = filter(lambda x: _id == x["key"][0], result["rows"])
-        result = [dict(zip(keys[:int(group_level.value)], r["key"]), count=r["value"]) for r in result]
+        result = [dict(zip(keys[:int(group_level.value)], r["key"]), count=r["value"],
+                       count_log=0 if r["value"] < 1 else math.log(r["value"]))
+                  for r in result]
 
     return JSONResponse(result, status_code=200 if result else 204)
