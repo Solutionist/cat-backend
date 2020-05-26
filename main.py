@@ -29,12 +29,12 @@ app.include_router(aurin_router, prefix="/aurin", tags=["Aurin data API"])
 app.include_router(data_router, prefix="/data", tags=["Twitter analysis data API"])
 
 
-@app.get("/language_codes")
+@app.get("/language_codes", tags=["Language code data API"])
 def get_lang_codes():
     return LANGUAGE_CODES
 
 
-@app.get("/language_codes/{language}")
+@app.get("/language_codes/{language}", tags=["Language code data API"])
 def get_lang_codes(language: str):
     return LANGUAGE_CODES.get(language, "")
 
