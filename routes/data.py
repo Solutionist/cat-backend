@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 
 from models.data import DataResponse, SINGLECANDIDATE_KEYS
 from utils.prog_globals import db_parsed
-
+from utils.language_code import  LANGUAGE_CODES
 data_router = APIRouter()
 
 
@@ -45,7 +45,9 @@ def get_data(group_level: GroupLevels, group_by: str = "year"):
         result = filter(lambda x: None not in x["key"], result["rows"])
         result = [dict(zip(keys[:int(group_level.value)], r["key"]), count=r["value"],
                        count_log=0 if r["value"] < 1 else math.log(r["value"])) for r in result]
-
+        if group_by in ["lang", "language"]:
+            for res in result:
+                res["language"] = LANGUAGE_CODES.get(res["language"], "Undefined")
     return JSONResponse(result, status_code=200 if result else 204)
 
 
@@ -65,5 +67,8 @@ def get_data(_id: str, group_level: GroupLevels, group_by: str = "year"):
         result = [dict(zip(keys[:int(group_level.value)], r["key"]), count=r["value"],
                        count_log=0 if r["value"] < 1 else math.log(r["value"]))
                   for r in result]
+        if group_by in ["lang", "language"]:
+            for res in result:
+                res["language"] = LANGUAGE_CODES.get(res["language"], "Undefined")
 
     return JSONResponse(result, status_code=200 if result else 204)
