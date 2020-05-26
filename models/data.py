@@ -7,6 +7,7 @@ class SingleCandidate(BaseModel):
     code: str
     emotion: str
     year: int
+    language: str
     count: int
 
 

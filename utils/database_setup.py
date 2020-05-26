@@ -56,7 +56,7 @@ def setup(_client):
     if master_view not in db.list_design_documents():
         print(f"<--- Creating views for `{db_name}` --->")
         all_custom_views = DesignDocument(db, document_id=master_view, partitioned=False)
-        all_custom_views.add_view("code_senti_lang",
+        all_custom_views.add_view("code_senti_year",
                                   map_func="""
                                         function (doc) {
                                             emit([doc.inferred_location.code, 
@@ -65,6 +65,16 @@ def setup(_client):
                                             1);
                                         }
                                       """,
+                                  reduce_func="_sum")
+        all_custom_views.add_view("code_senti_lang",
+                                  map_func="""
+                                                function (doc) {
+                                                    emit([doc.inferred_location.code, 
+                                                        doc.inferred_sentiment.emotion,
+                                                        doc.inferred_language], 
+                                                    1);
+                                                }
+                                              """,
                                   reduce_func="_sum")
         all_custom_views.save()
         print("<-- Creation complete -->")

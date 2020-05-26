@@ -67,6 +67,9 @@ docker rm $(docker ps -a -q)
 # Remove all dangling docker related stuff
 docker system prune -a --volumes
 
+# for proxies
+mkdir ~/.docker
+sudo nano ~/.docker/config.json
 {
  "proxies":
  {
