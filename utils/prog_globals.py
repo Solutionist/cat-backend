@@ -26,7 +26,8 @@ try:
     db_ref: CouchDatabase = client[os.getenv("DB_REF")]
     db_tweet: CouchDatabase = client[os.getenv("DB_TWEET")]
     db_parsed: CouchDatabase = client[os.getenv("DB_PARSE")]
-    # db_oldTweet = client[os.getenv("DB_OLD_TWEET")]
+    if os.getenv("FORCE_DB_SETUP").lower() == "true":
+        raise BaseException()
 except BaseException as e:
     print(type(e), e)
     setup(client)
